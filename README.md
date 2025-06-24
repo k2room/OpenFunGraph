@@ -89,9 +89,9 @@ Note that related path should be set as ``env_vars.bash.template``.
 
 ```bash
 export FUNGRAPH3D_ROOT=
-export FUNGRAPH3D_CONFIG_PATH=${FG_FOLDER}/conceptgraph/dataset/dataconfigs/scenefuncgraph/scenefuncgraph.yaml
+export FUNGRAPH3D_CONFIG_PATH=${FG_FOLDER}/openfungraph/dataset/dataconfigs/fungraph3d/fungraph3d.yaml
 export SCENEFUN3D_ROOT=  # for SceneFun3D, it should be with dev / test
-export SCENEFUN3D_CONFIG_PATH=${CG_FOLDER}/conceptgraph/dataset/dataconfigs/scenefunc3d/scenefunc3d.yaml
+export SCENEFUN3D_CONFIG_PATH=${FG_FOLDER}/openfungraph/dataset/dataconfigs/scenefun3d/scenefun3d.yaml
 ```
 
 OpenFunGraph can also be easily run on other dataset. 
