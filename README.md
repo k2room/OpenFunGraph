@@ -17,23 +17,29 @@ conda activate openfungraph
 # For example, if you have a GPU with CUDA 11.8
 # Note that this version is compatible with the LLaVA repo
 # Here we install cudatoolkit via Conda for installation of Grounded-SAM
-conda install pytorch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 pytorch-cuda=11.8 cudatoolkit=11.8 -c pytorch -c nvidia
+# 오타 주의. cudatoolkit=11.8 아니라 cuda-toolkit=11.8 설치해야함
+conda install pytorch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 pytorch-cuda=11.8 cuda-toolkit=11.8 -c pytorch -c nvidia
 
 # Install the Faiss library (CPU version should be fine)
 conda install -c pytorch faiss-cpu=1.7.4 mkl=2021 blas=1.0=mkl
 
 # Install Pytorch3D by 
-https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md
+# https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md 대신 아래 명령어 사용
+conda install pytorch3d -c pytorch3d
 # We recommend installing from a local clone to avoid confliction
 
 # Install the required libraries
 pip install tyro open_clip_torch wandb h5py openai hydra-core distinctipy pyviz3d line_profiler
 
 # Install the gradslam package and its dependencies
-git clone https://github.com/krrish94/chamferdist.git
-cd chamferdist
-pip install .
-cd ..
+# git clone https://github.com/krrish94/chamferdist.git 과정 대신 아래 conda 명령어 사용
+# cd chamferdist
+# pip install .
+# cd ..
+conda install nvidia/label/cuda-11.8.0::cuda-nvcc
+conda install nvidia::cuda-cudart-dev
+pip install chamferdist
+
 git clone https://github.com/gradslam/gradslam.git
 cd gradslam
 git checkout conceptfusion
