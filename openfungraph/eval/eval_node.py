@@ -103,7 +103,8 @@ if __name__ == '__main__':
         exit(1)
     
     if args.dataset == 'SceneFun3D':
-        scene_pc = o3d.io.read_point_cloud(args.root_path+'/scans/'+args.scene+'_laser_scan.ply')
+        # scene_pc = o3d.io.read_point_cloud(args.root_path+'/scans/'+args.scene+'_laser_scan.ply')
+        scene_pc = o3d.io.read_point_cloud(args.root_path+'/'+args.split+'/'+args.scene+'/'+args.scene+'_laser_scan.ply')
         refined_transform = np.load(args.root_path+'/'+args.split+'/'+args.scene+'/'+args.video+'/'+args.video+'_refined_transform.npy') 
         scene_pc.transform(refined_transform)
     elif args.dataset == 'FunGraph3D':
