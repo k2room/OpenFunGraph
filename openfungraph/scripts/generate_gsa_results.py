@@ -56,14 +56,15 @@ torch.set_grad_enabled(False)
     
 # GroundingDINO config and checkpoint
 GROUNDING_DINO_CONFIG_PATH = os.path.join(GSA_PATH, "GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py")
-GROUNDING_DINO_CHECKPOINT_PATH = os.path.join(GSA_PATH, "./groundingdino_swint_ogc.pth")
+# GROUNDING_DINO_CHECKPOINT_PATH = os.path.join(GSA_PATH, "./groundingdino_swint_ogc.pth")
+GROUNDING_DINO_CHECKPOINT_PATH = os.path.join("/home/main/workspace/k2room2/CAPA-3DSG/checkpoints/groundingdino_swint_ogc.pth")
 
 # Segment-Anything checkpoint
 SAM_ENCODER_VERSION = "vit_h"
-SAM_CHECKPOINT_PATH = os.path.join(GSA_PATH, "./sam_vit_h_4b8939.pth")
-
-RAM_CHECKPOINT_PATH = os.path.join(GSA_PATH, "./ram_swin_large_14m.pth")
-
+# SAM_CHECKPOINT_PATH = os.path.join(GSA_PATH, "./sam_vit_h_4b8939.pth")
+# RAM_CHECKPOINT_PATH = os.path.join(GSA_PATH, "./ram_swin_large_14m.pth")
+SAM_CHECKPOINT_PATH = os.path.join("/home/main/workspace/k2room2/CAPA-3DSG/checkpoints/sam_vit_h_4b8939.pth")
+RAM_CHECKPOINT_PATH = os.path.join("/home/main/workspace/k2room2/CAPA-3DSG/checkpoints/ram_swin_large_14m.pth")
 
 def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
