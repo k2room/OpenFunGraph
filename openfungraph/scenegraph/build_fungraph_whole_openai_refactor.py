@@ -37,6 +37,16 @@ import requests
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=openai.api_key)
 
+_INTERACTABLE_MASK_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "mask":   {"type": "array", "items": {"type": "boolean"}},
+        "reason": {"type": "array", "items": {"type": "string"}}
+    },
+    "required": ["mask", "reason"]
+}
+
 # --- Responses API helpers (role-aware) ---
 def _to_responses_input(msgs):
     """
@@ -91,7 +101,36 @@ def _ask_gpt4_text(payload, timeout=60):
     )
     return _resp_text(resp)
 
-
+def _ask_json_response(payload, timeout=60, model="gpt-4o-mini"):
+    """
+    Responses API로 '반드시 JSON(스키마 강제)'을 돌려받는다.
+    payload: list(messages) 또는 str/dict (당신의 _as_responses_input 으로 감쌈)
+    """
+    resp = client.responses.create(
+        model=model,  # ← "gpt-4" 대신 최신 모델
+        input=_as_responses_input(payload),
+        # JSON 스키마 강제
+        response_format={
+            "type": "json_schema",
+            "json_schema": {
+                "name": "InteractableMask",
+                "schema": _INTERACTABLE_MASK_SCHEMA,
+            },
+        },
+        # 토큰 여유
+        # max_output_tokens=1536,
+        # 시스템 규칙(선택): 반드시 JSON만
+        # instructions="Return ONLY a JSON object that matches the provided schema.",
+        timeout=timeout,
+    )
+    # 공식 라이브러리에서 권장하는 통합 프로퍼티
+    # (README 예시: response.output_text)
+    text = getattr(resp, "output_text", None) or ""
+    if not text:
+        # 디버깅 도움: 원시 output 확인
+        print("Empty output_text. Raw response:", resp)
+        raise RuntimeError("Empty model output_text")
+    return json.loads(text)
 
 
 @dataclass
@@ -483,7 +522,7 @@ def refine_node_captions(args):
     # load the prompt
     gpt_messages = GPTPrompt().get_json()
 
-    TIMEOUT = 60  # Timeout in seconds
+    TIMEOUT = 80  # Timeout in seconds
     if not args.part_reg:
         responses_savedir = Path(args.cachedir) / "cfslam_gpt-4_responses"
     else:
@@ -882,7 +921,7 @@ def build_rigid_funcgraph(args, results, part_results):
             part_summarys[_d["id"]] = _d["response"]["summary"]
             part_tags[_d["id"]] = _d["response"]["object_tag"]
 
-    TIMEOUT = 60  # timeout in seconds
+    TIMEOUT = 80  # timeout in seconds
     relations = []
     if not (Path(args.cachedir) / "cfslam_object_rigid_relations.json").exists():
         # pruning using GPT-4 and ensuring the functional edges
@@ -1111,14 +1150,15 @@ def filter_remote_interactable_objects(args, results):
         #     prompt=[{"role": "user", "content": DEFAULT_PROMPT + "\n\n" + json.dumps(object_tags)}],
         #     timeout=60,  # Timeout in seconds
         # )
-        resp_text = _ask_gpt4_text(
+        resp_json = _ask_json_response(
             [{"role": "user", "content": DEFAULT_PROMPT + "\n\n" + json.dumps(object_tags)}],
-            60,
+            timeout=60,
+            model="gpt-4o-mini",
         )
 
-
-        output_dict = {'id': pruned_id_list}
-        output_dict['object_tags'] = object_tags
+        output_dict = {'id': pruned_id_list, 'object_tags': object_tags}
+        output_dict["mask"] = resp_json["mask"]
+        output_dict["reason"] = resp_json["reason"]
         # try:
         #     # Attempt to parse the output as a JSON
         #     chat_output_json = json.loads(chat_completion["choices"][0]["message"]["content"])
